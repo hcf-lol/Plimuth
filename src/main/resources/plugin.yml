@@ -1,0 +1,10 @@
+name: Plimuth
+version: 1.0.0
+main: lol.hcf.plimuth.plugin.Plimuth
+
+commands:
+  rank:
+    description: Rank management commands
+    permission: rank.command
+
+depend: [Foundation]
