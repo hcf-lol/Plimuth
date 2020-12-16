@@ -1,25 +1,28 @@
 package lol.hcf.plimuth.rank;
 
-import com.google.gson.*;
-import lol.hcf.foundation.data.impl.json.DataFile;
-import lol.hcf.foundation.data.impl.json.DataTypeAdapter;
-import lol.hcf.foundation.data.impl.json.TypeAdapterContainer;
+import com.mongodb.BasicDBList;
+import com.mongodb.client.MongoCollection;
+import lol.hcf.foundation.database.ConnectionHandler;
+import org.bson.BsonDocument;
+import org.bson.Document;
+import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
-import java.io.File;
-import java.lang.reflect.Type;
-import java.util.HashMap;
-import java.util.Map;
+public class RankManager implements RankRegistry {
 
-public class RankManager extends DataFile implements RankRegistry {
+    public static final ExecutorService EXECUTOR_SERVICE = Executors.newCachedThreadPool();
 
     private final Map<String, Rank> ranks = new HashMap<>();
 
-    public RankManager(File targetFile) {
-        super(targetFile, new TypeAdapterContainer<>(RankManager.class, new TypeAdapter()));
-    }
+    private ConnectionHandler connectionHandler;
+    private MongoCollection<Document> collection;
 
-    private RankManager() {
-        super(null);
+    public RankManager(ConnectionHandler handler) {
+        this.connectionHandler = handler;
+        this.collection = handler.getDatabase().getDatabase("plimuth").getCollection("ranks");
+        this.fetchRanks();
     }
 
     @Override
@@ -32,18 +35,50 @@ public class RankManager extends DataFile implements RankRegistry {
         this.ranks.put(rank.getId().toLowerCase(), rank);
     }
 
-    public static class TypeAdapter implements DataTypeAdapter<RankManager> {
-        @Override
-        public RankManager deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-            RankManager manager = new RankManager();
-            Rank[] ranks = context.deserialize(json, Rank[].class);
-            for (Rank rank : ranks) manager.addRank(rank);
-            return manager;
+    public void fetchRanks() {
+        this.ranks.clear();
+        Map<Rank, Map.Entry<Set<String>, Set<String>>> rankPermissionMap = new HashMap<>();
+        for (Document document : this.collection.find()) {
+            Rank rank = new Rank(document.getString("_id"));
+            rank.setPrefix(document.getString("prefix"));
+
+            Set<String> parents = new HashSet<>(document.getList("inherits", String.class, Collections.emptyList()));
+            Set<String> permissions = new HashSet<>(document.getList("permissions", String.class, Collections.emptyList()));
+            rankPermissionMap.put(rank, new AbstractMap.SimpleEntry<>(parents, permissions));
+
+            this.ranks.put(rank.getId(), rank);
         }
 
-        @Override
-        public JsonElement serialize(RankManager src, Type typeOfSrc, JsonSerializationContext context) {
-            return context.serialize(src.ranks.values());
+        for (Map.Entry<Rank, Map.Entry<Set<String>, Set<String>>> entry : rankPermissionMap.entrySet()) {
+            Rank rank = entry.getKey();
+            Set<String> parents = entry.getValue().getKey();
+            Set<String> permissions = entry.getValue().getValue();
+
+            Set<Rank> parentRanks = new HashSet<>(parents.size());
+            parents.forEach((s) -> parentRanks.add(Objects.requireNonNull(RankManager.this.getRank(s))));
+            rank.setParents(parentRanks);
+
+            parentRanks.forEach((r) -> permissions.addAll(r.getPermissions()));
+
         }
+    }
+
+    public void postRanks() {
+        List<Document> ranks = new ArrayList<>(this.ranks.size());
+
+        for (Rank rank : this.ranks.values()) {
+            Set<String> parents = rank.getParents() == null ? null : rank.getParents().stream().map(Rank::getId).collect(Collectors.toSet());
+
+            Document object = new Document()
+                    .append("_id", rank.getId())
+                    .append("prefix", rank.getPrefix())
+                    .append("inherits", parents)
+                    .append("permissions", new BasicDBList().addAll(rank.getPermissions()));
+
+            ranks.add(object);
+        }
+
+        this.collection.deleteMany(new BsonDocument());
+        this.collection.insertMany(ranks);
     }
 }

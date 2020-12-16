@@ -4,7 +4,7 @@ import lol.hcf.foundation.command.Command;
 import lol.hcf.foundation.command.annotation.Argument;
 import lol.hcf.foundation.command.annotation.CommandEntryPoint;
 import lol.hcf.foundation.command.parse.CommandTypeAdapter;
-import lol.hcf.plimuth.plugin.PluginConfiguration;
+import lol.hcf.plimuth.plugin.config.PluginConfiguration;
 import lol.hcf.plimuth.rank.Rank;
 import lol.hcf.plimuth.rank.RankRegistry;
 import org.bukkit.command.CommandSender;

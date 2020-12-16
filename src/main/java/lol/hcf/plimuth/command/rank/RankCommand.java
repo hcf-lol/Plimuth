@@ -2,7 +2,7 @@ package lol.hcf.plimuth.command.rank;
 
 import lol.hcf.foundation.command.tree.CommandTree;
 import lol.hcf.plimuth.command.type.RankAdapter;
-import lol.hcf.plimuth.plugin.PluginConfiguration;
+import lol.hcf.plimuth.plugin.config.PluginConfiguration;
 import lol.hcf.plimuth.rank.Rank;
 import lol.hcf.plimuth.rank.RankRegistry;
 

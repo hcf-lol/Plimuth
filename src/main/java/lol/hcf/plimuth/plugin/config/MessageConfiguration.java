@@ -7,6 +7,8 @@ import java.io.File;
 
 public class MessageConfiguration extends ConfigurationFile {
 
+    public final String rankTag = ChatColor.GRAY.toString() + ChatColor.BOLD + "[%s" + ChatColor.RESET + ChatColor.GRAY + ChatColor.BOLD + "] ";
+    public final String chatFormat = "%s: %s";
     public final String rankExistsError = ChatColor.RED + "A rank with the name %s already exists.";
     public final String rankCreatedMessage = ChatColor.GREEN + "Created new rank %s.";
 
