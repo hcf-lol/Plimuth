@@ -20,8 +20,8 @@ public class ChatListener implements Listener {
         PlayerData data = PlayerData.valueOf(event.getPlayer());
         event.setFormat(this.config.chatFormat);
 
-        if (data.getRank() != null) {
-            event.setFormat(String.format(this.config.chatFormat, data.getRank().getRankTag()) + event.getFormat());
+        if (data.getRank() != null && data.getRank().getPrefix() != null) {
+            event.setFormat(String.format(this.config.chatFormat, data.getRank().getPrefix()) + event.getFormat());
         }
     }
 
