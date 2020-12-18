@@ -1,0 +1,23 @@
+plugins {
+    id 'java'
+}
+
+group 'hcf.lol'
+version '1.0.0'
+
+repositories {
+    mavenCentral()
+
+    maven {
+        name = "GitHubPackages"
+        url = uri("https://maven.pkg.github.com/hcf-lol/agentmanager")
+        credentials {
+            username = project.findProperty("gpr.user") ?: System.getenv("GPR_USERNAME")
+            password = project.findProperty("gpr.key") ?: System.getenv("GPR_TOKEN")
+        }
+    }
+}
+
+dependencies {
+    implementation group: 'lol.hcf', name: 'agentmanager', version: '1.0.0'
+}
