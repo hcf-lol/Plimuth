@@ -18,7 +18,7 @@ public class RankCommand implements Supplier<CommandTree<PluginConfiguration>> {
                 .registerTypeMapping(Rank.class, new RankAdapter(rankRegistry))
                 .registerSubcommand((o1, o2) -> new RankCreateCommand(o1, o2, rankRegistry), "Utility Commands", "Create a new rank")
                 .registerSubcommand((o1, o2) -> new RankSyncCommand(o1, o2, rankRegistry), "Utility Commands", "Sync ranks with remote server")
-                .registerSubcommand((o1, o2) -> new RankFetchCommand(o1, o2, rankRegistry), "Utility Commands", "Fetch ranks from  remote server")
+                .registerSubcommand((o1, o2) -> new RankFetchCommand(o1, o2, rankRegistry), "Utility Commands", "Fetch ranks from remote server")
                 .build();
     }
 

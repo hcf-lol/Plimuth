@@ -25,10 +25,10 @@ public class Plimuth extends JavaPlugin implements PluginConfiguration {
 
         ConnectionHandler handler = Foundation.getConnectionHandler();
 
-        new RankCommand(this, this.rankManager).get().setCommand(this.getCommand("rank"));
-
-        Bukkit.getPluginManager().registerEvents(new JoinListener(), this);
+        Bukkit.getPluginManager().registerEvents(new JoinListener(this.rankManager, handler), this);
         Bukkit.getPluginManager().registerEvents(new ChatListener(this), this);
+
+        new RankCommand(this, this.rankManager).get().setCommand(this.getCommand("rank"));
 
         super.onEnable();
     }

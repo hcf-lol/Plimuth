@@ -21,3 +21,9 @@ repositories {
 dependencies {
     implementation group: 'lol.hcf', name: 'agentmanager', version: '1.0.0'
 }
+
+jar {
+    manifest {
+        attributes["Premain-Class"] = "lol.hcf.plimuth.agent.PlimuthAgent"
+    }
+}

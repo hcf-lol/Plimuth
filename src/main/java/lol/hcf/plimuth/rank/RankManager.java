@@ -5,22 +5,30 @@ import com.mongodb.client.MongoCollection;
 import lol.hcf.foundation.database.ConnectionHandler;
 import org.bson.BsonDocument;
 import org.bson.Document;
+
 import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 public class RankManager implements RankRegistry {
 
-    public static final ExecutorService EXECUTOR_SERVICE = Executors.newCachedThreadPool();
-
     private final Map<String, Rank> ranks = new HashMap<>();
+    private final Rank defaultRank;
 
     private final MongoCollection<Document> collection;
 
     public RankManager(ConnectionHandler handler) {
         this.collection = handler.getDatabase().getDatabase("plimuth").getCollection("ranks");
         this.fetchRanks();
+
+        Rank rank = this.ranks.get("default");
+        rank = this.ranks.get("default");
+        if (rank == null) {
+            rank = new Rank("default");
+            this.addRank(rank);
+            this.syncRanks();
+        }
+
+        this.defaultRank = rank;
     }
 
     @Override
@@ -34,17 +42,24 @@ public class RankManager implements RankRegistry {
     }
 
     @Override
+    public Rank getDefaultRank() {
+        return this.defaultRank;
+    }
+
+    @Override
     public void syncRanks() {
         List<Document> ranks = new ArrayList<>(this.ranks.size());
 
         for (Rank rank : this.ranks.values()) {
             Set<String> parents = rank.getParents() == null ? null : rank.getParents().stream().map(Rank::getId).collect(Collectors.toSet());
+            BasicDBList list = new BasicDBList();
+            list.addAll(rank.getPermissions());
 
             Document object = new Document()
                     .append("_id", rank.getId())
                     .append("prefix", rank.getPrefix())
                     .append("inherits", parents)
-                    .append("permissions", new BasicDBList().addAll(rank.getPermissions()));
+                    .append("permissions", list);
 
             ranks.add(object);
         }
