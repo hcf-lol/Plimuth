@@ -13,6 +13,7 @@ import org.bson.BsonDocument;
 import org.bson.Document;
 import org.bson.UuidRepresentation;
 import org.bson.types.ObjectId;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -38,7 +39,7 @@ public class JoinListener implements Listener {
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
         PlayerDataContainer container = ((PlayerExtension) event.getPlayer()).getPlayerData();
-        PlayerData data = new PlayerData();
+        PlayerData data = new PlayerData(event.getPlayer());
 
         String uuid = event.getPlayer().getUniqueId().toString();
         String rank;
@@ -61,8 +62,11 @@ public class JoinListener implements Listener {
 
         Rank rankHandle = rank == null ? this.rankRegistry.getDefaultRank() : this.rankRegistry.getRank(rank);
 
+        data.setRank(rankHandle);
         PlimuthAgent.getConsumer().accept(event.getPlayer(), rankHandle);
         container.set(data);
+
+        PlayerData.PLAYERS.add(data);
     }
 
 }
