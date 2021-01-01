@@ -1,5 +1,7 @@
 package lol.hcf.plimuth.rank;
 
+import lol.hcf.foundation.gui.ItemInfo;
+import org.bukkit.Material;
 import org.bukkit.permissions.Permissible;
 import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionAttachment;
@@ -18,9 +20,13 @@ public class Rank implements Permissible {
 
     private Set<String> permissions;
 
+    private ItemInfo itemInfo;
+
     public Rank(String id) {
         this.id = id;
+        this.parents = new HashSet<>();
         this.permissions = new HashSet<>();
+        this.itemInfo = new ItemInfo(Material.BOOK).setName(this.id);
     }
 
     public String getId() {

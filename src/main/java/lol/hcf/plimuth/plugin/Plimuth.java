@@ -21,7 +21,7 @@ public class Plimuth extends JavaPlugin implements PluginConfiguration {
     @Override
     public void onEnable() {
         this.messageConfiguration = new MessageConfiguration(new File(this.getDataFolder(), "messages.yml"));
-        this.rankManager = new RankManager(Foundation.getConnectionHandler());
+        this.rankManager = new RankManager(Foundation.getConnectionHandler(), new File(this.getDataFolder(), "cache/ranks"));
 
         ConnectionHandler handler = Foundation.getConnectionHandler();
 
