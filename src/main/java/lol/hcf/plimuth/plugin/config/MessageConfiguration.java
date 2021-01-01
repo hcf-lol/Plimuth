@@ -15,6 +15,10 @@ public class MessageConfiguration extends ConfigurationFile {
     public final String rankSyncedMessage = ChatColor.GREEN + "Synced ranks with database.";
     public final String rankFetchedMessage = ChatColor.GREEN + "Fetched ranks from database.";
 
+    public final String playerNotFound = ChatColor.RED + "Player %s not found.";
+
+    public final String rankExpiryMessage = ChatColor.YELLOW + "Your rank has expired.";
+
     public MessageConfiguration(File configFile) {
         super(configFile);
         super.load();

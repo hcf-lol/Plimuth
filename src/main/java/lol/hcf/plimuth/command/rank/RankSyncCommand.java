@@ -1,10 +1,13 @@
 package lol.hcf.plimuth.command.rank;
 
 import lol.hcf.foundation.command.Command;
+import lol.hcf.foundation.command.annotation.Argument;
 import lol.hcf.foundation.command.annotation.CommandEntryPoint;
+import lol.hcf.foundation.command.annotation.Optional;
 import lol.hcf.foundation.command.parse.CommandTypeAdapter;
 import lol.hcf.plimuth.plugin.config.PluginConfiguration;
 import lol.hcf.plimuth.rank.RankRegistry;
+import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
 public class RankSyncCommand extends Command<PluginConfiguration> {
@@ -17,8 +20,17 @@ public class RankSyncCommand extends Command<PluginConfiguration> {
     }
 
     @CommandEntryPoint
-    public void onCommand(CommandSender sender) {
-        this.rankRegistry.syncRanks();
+    public void onCommand(CommandSender sender, @Argument("local") @Optional Boolean local) {
+        try {
+            if (local != null && local) {
+                this.rankRegistry.syncFromLocal();
+            } else {
+                this.rankRegistry.syncRanks();
+            }
+        } catch (Exception e) {
+            sender.sendMessage(ChatColor.RED + "Command Error: " + e.getMessage());
+        }
+
         sender.sendMessage(super.config.getMessageConfiguration().rankSyncedMessage);
     }
 
